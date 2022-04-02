@@ -1,23 +1,28 @@
 import * as React from "react"
 import { Link } from "gatsby"
-// import { PrismaClient } from '@prisma/client'
-import prisma from '../lib/prisma';
+import { PrismaClient } from '@prisma/client'
+import { Box } from '@chakra-ui/react'
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 
-// const prisma = new PrismaClient()
+const prisma = new PrismaClient()
 
 const UsingSSRPrisma = ({ serverData }) => {
   return (
     <Layout>
       <Seo title="Using SSR" />
       <h1>SSR page</h1>
-      <img
-        style={{ width: "300px" }}
-        alt="A random dog"
-        src={serverData.message}
-      />
+   
+      <div>
+      {serverData.map((author) => (
+          <Box key={author.id} fontSize="lg">
+            <Link to={`/author/${author.id}`}>
+              {author.name}
+            </Link>
+          </Box>
+        ))}
+      </div>
 
       <Link to="/">Go back to the homepage</Link>
     </Layout>
@@ -27,25 +32,20 @@ const UsingSSRPrisma = ({ serverData }) => {
 export default UsingSSRPrisma
 
 export async function getServerData() {
-  try {
-    // const res = await fetch(`https://dog.ceo/api/breeds/image/random`)
-    const res = await prisma.author.findMany()
-
-
-    console.log(res)
-
-
-    if (!res.ok) {
-      throw new Error(`Response failed`)
-    }
+    // try {
+    //   const res = await fetch(`https://dog.ceo/api/breeds/image/random`)
+      const res = await prisma.author.findMany()
+      console.log(res)
     return {
-      props: await res.json(),
+    //   props: await res.json(),
+      props: await res,
     }
-  } catch (error) {
-    return {
-      status: 500,
-      headers: {},
-      props: {},
-    }
-  }
+//   } catch (error) {
+//     console.log(' ----==== prisma errors ====---- ')
+//     return {
+//       status: 500,
+//       headers: {},
+//       props: {},
+//     }
+//   }
 }
